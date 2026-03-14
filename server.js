@@ -6,7 +6,7 @@ const path = require("path");
 const app = express();
 const PORT = 3000;
 
-const uploadPath = path.join(__dirname, "uploads");
+const uploadPath = path.join("public", "uploads");
 
 // multer setup
 const storage = multer.diskStorage({
@@ -50,7 +50,7 @@ res.json(files);
 app.use("/uploads", express.static(uploadPath));
 
 // serve website
-app.use(express.static(__dirname));
+app.use(express.static("public"));
 
 // start server
 app.listen(PORT, () => {
