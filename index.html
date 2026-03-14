@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Skills Exchange</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f2f2f2;
+text-align:center;
+}
+
+h1{
+background:#333;
+color:white;
+padding:15px;
+}
+
+.container{
+background:white;
+padding:20px;
+margin:20px auto;
+width:60%;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+button{
+background:#28a745;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#218838;
+}
+
+.file{
+margin:10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Skills Exchange</h1>
+
+<div class="container">
+
+<h2>Share Notes</h2>
+
+<input type="file" id="fileInput">
+<br><br>
+
+<button onclick="uploadFile()">Upload</button>
+
+</div>
+
+<div class="container">
+
+<h2>Learn</h2>
+
+<div id="filesList"></div>
+
+</div>
+
+<script>
+
+function uploadFile(){
+
+const fileInput=document.getElementById("fileInput");
+const file=fileInput.files[0];
+
+if(!file){
+alert("Please select file");
+return;
+}
+
+const formData=new FormData();
+formData.append("file",file);
+
+fetch("/upload",{
+method:"POST",
+body:formData
+})
+.then(()=>{
+alert("File uploaded successfully!");
+loadFiles();
+});
+
+}
+
+function loadFiles(){
+
+fetch("/files")
+.then(res=>res.json())
+.then(files=>{
+
+const list=document.getElementById("filesList");
+list.innerHTML="";
+
+files.forEach(file=>{
+
+const div=document.createElement("div");
+div.className="file";
+
+div.innerHTML=`<a href="/uploads/${file}" target="_blank">${file}</a>`;
+
+list.appendChild(div);
+
+});
+});
+
+}
+
+window.onload=loadFiles;
+
+</script>
+
+</body>
+</html>
