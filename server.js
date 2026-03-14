@@ -1,58 +1,19 @@
 const express = require("express");
 const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+const Note = require("./models/Note");
 
-const app = express();
-const PORT = 3000;
+const router = express.Router();
 
-const uploadPath = path.join("public", "uploads");
+const upload = multer({ dest: "uploads/" });
 
-// multer setup
-const storage = multer.diskStorage({
-destination: function (req, file, cb) {
-cb(null, uploadPath);
-},
-filename: function (req, file, cb) {
-cb(null, file.originalname);
-}
+router.post("/upload", upload.single("file"), async (req, res) => {
+  const note = new Note({
+    title: req.body.title,
+    file: req.file.filename
+  });
+
+  await note.save();
+  res.json({ message: "Note uploaded successfully" });
 });
 
-const upload = multer({ storage });
-
-// upload route
-app.post("/upload", upload.single("file"), (req, res) => {
-
-if (!req.file) {
-return res.send("Upload failed");
-}
-
-res.send("File uploaded successfully!");
-
-});
-
-// list files
-app.get("/files", (req, res) => {
-
-fs.readdir(uploadPath, (err, files) => {
-
-if (err) {
-return res.json([]);
-}
-
-res.json(files);
-
-});
-
-});
-
-// serve uploads
-app.use("/uploads", express.static(uploadPath));
-
-// serve website
-app.use(express.static("public"));
-
-// start server
-app.listen(PORT, () => {
-console.log("Server running at http://localhost:3000");
-});
+module.exports = router;
